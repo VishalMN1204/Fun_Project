@@ -10,7 +10,7 @@ public class Card : MonoBehaviour
     [SerializeField] Sprite cardBackSprite;
     [SerializeField] bool isFlipped;
     bool isMatched = false;
-
+    public bool IsMatched { get { return isMatched; } }
     private void OnEnable()
     {
         cardBtn.onClick.AddListener(() => SelectCardToFlip());
@@ -24,7 +24,7 @@ public class Card : MonoBehaviour
     public void InitializeCard(Sprite card, int _id)
     {
         CardFrontSprite = card;
-        cardImage.sprite = cardBackSprite;
+        cardImage.sprite = card;
         CardId = _id;
     }
 

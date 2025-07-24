@@ -15,6 +15,7 @@ public class CardController : MonoBehaviour
 
     [SerializeField] List<Sprite> allCardSpritesList = new();
     [SerializeField] List<Sprite> cardShuffleList = new();
+    List<Card>cardLists = new();
 
     Card firstSelectedCard;
     Card secondSelectedCard;
@@ -31,20 +32,13 @@ public class CardController : MonoBehaviour
         Instance = this;
     }
 
-
-    // Start is called before the first frame update
-    private void Start()
+    public void SetupLevel(CardLevelData level)
     {
-        SetupLevel(2, 2); // Example: 2x2 grid = 4 cards = 2 pairs
-    }
-
-    private void SetupLevel(int row, int column)
-    {
-        int totalCards = row * column;
+        int totalCards = level.rows * level.columns;
         int pairCount = totalCards / 2;
 
-        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-        grid.constraintCount = column;
+        grid.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+        grid.constraintCount = level.rows;
         OnLoadCardSprites();
         GenerateCardPairs(pairCount);
         SpawnCards();
@@ -75,7 +69,7 @@ public class CardController : MonoBehaviour
             cardShuffleList.Add(sprite);
         }
 
-        cardShuffleList = cardShuffleList.OrderBy(_ => UnityEngine.Random.value).ToList();
+        cardShuffleList = cardShuffleList.OrderBy(_ => Random.value).ToList();
     }
 
     private void SpawnCards()
@@ -84,8 +78,10 @@ public class CardController : MonoBehaviour
         {
             GameObject cardGO = Instantiate(cardPrefab, grid.transform);
             Card card = cardGO.GetComponent<Card>();
-            card.InitializeCard(cardShuffleList[i], i); // Send index + sprite
+            card.InitializeCard(cardShuffleList[i], i);
+            cardLists.Add(card);
         }
+        StartCoroutine(nameof(FlipCardsToBackOnStart));
     }
 
     public void SelectCard(Card selectedCard)
@@ -107,11 +103,14 @@ public class CardController : MonoBehaviour
     IEnumerator MatchCardsCheck()
     {
         isChecking = true;
+        UIManager.Instance.IncrementTurnScore();
         yield return new WaitForSeconds(checkDelay);
         if (firstSelectedCard.CardFrontSprite == secondSelectedCard.CardFrontSprite)
         {
             firstSelectedCard.SetMatched();
             secondSelectedCard.SetMatched();
+            UIManager.Instance.IncrementMatchScore();
+            StartCoroutine(nameof(CheckLevelOver));
         }
         else
         {
@@ -121,5 +120,41 @@ public class CardController : MonoBehaviour
         isChecking = false;
         firstSelectedCard = null;
         secondSelectedCard = null;
+    }
+
+    void ClearOutCards()
+    {
+        foreach(Card card in cardLists)
+        {
+            Destroy(card.gameObject);
+        }
+        cardLists.Clear();
+    }
+
+    IEnumerator FlipCardsToBackOnStart()
+    {
+        yield return new WaitForSeconds(1f);
+        foreach (Card card in cardLists)
+        {
+            card.FlipCardSprite(false);
+        }
+    }
+
+    IEnumerator CheckLevelOver()
+    {
+        foreach (Card card in cardLists)
+        {
+            if (!card.IsMatched) yield break;
+        }
+        yield return new WaitForSeconds(1f);
+        StartCoroutine(nameof(ChangeLevel));
+    }
+
+    IEnumerator ChangeLevel()
+    {
+        UIManager.Instance.ShowLoadingPanel();
+        ClearOutCards();
+        yield return new WaitForSeconds(1f);
+        LevelManager.Instance.IncrementLevel();
     }
 }
