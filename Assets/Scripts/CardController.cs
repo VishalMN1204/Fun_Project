@@ -3,15 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.U2D;
+using UnityEngine.UI;
 
 public class CardController : MonoBehaviour
 {
+    public static CardController Instance { get; private set; }
+
     [SerializeField] GameObject cardPrefab;
-    [SerializeField] Transform gridTransform;
+    [SerializeField] GridLayoutGroup grid;
     [SerializeField] SpriteAtlas cardAtlas;
 
     [SerializeField] List<Sprite> allCardSpritesList = new();
-    [SerializeField] List <Sprite> cardShuffleList = new();
+    [SerializeField] List<Sprite> cardShuffleList = new();
+
+    Card firstSelectedCard;
+    Card secondSelectedCard;
+    bool isChecking;
+    private float checkDelay = 1f;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+
     // Start is called before the first frame update
     private void Start()
     {
@@ -23,6 +43,8 @@ public class CardController : MonoBehaviour
         int totalCards = row * column;
         int pairCount = totalCards / 2;
 
+        grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        grid.constraintCount = column;
         OnLoadCardSprites();
         GenerateCardPairs(pairCount);
         SpawnCards();
@@ -31,7 +53,7 @@ public class CardController : MonoBehaviour
 
     private void OnLoadCardSprites()
     {
-       allCardSpritesList.Clear();
+        allCardSpritesList.Clear();
 
         Sprite[] spriteArray = new Sprite[cardAtlas.spriteCount];
         cardAtlas.GetSprites(spriteArray);
@@ -49,7 +71,7 @@ public class CardController : MonoBehaviour
         foreach (int id in selectedIds)
         {
             Sprite sprite = allCardSpritesList[id];
-            cardShuffleList.Add(sprite); 
+            cardShuffleList.Add(sprite);
             cardShuffleList.Add(sprite);
         }
 
@@ -60,9 +82,44 @@ public class CardController : MonoBehaviour
     {
         for (int i = 0; i < cardShuffleList.Count; i++)
         {
-            GameObject cardGO = Instantiate(cardPrefab, gridTransform);
+            GameObject cardGO = Instantiate(cardPrefab, grid.transform);
             Card card = cardGO.GetComponent<Card>();
             card.InitializeCard(cardShuffleList[i], i); // Send index + sprite
         }
+    }
+
+    public void SelectCard(Card selectedCard)
+    {
+        if (isChecking || selectedCard == firstSelectedCard || selectedCard == secondSelectedCard) return;
+        if (firstSelectedCard == null)
+        {
+            firstSelectedCard = selectedCard;
+            selectedCard.FlipCardSprite();
+        }
+        else
+        {
+            secondSelectedCard = selectedCard;
+            selectedCard.FlipCardSprite();
+            StartCoroutine(nameof(MatchCardsCheck));
+        }
+    }
+
+    IEnumerator MatchCardsCheck()
+    {
+        isChecking = true;
+        yield return new WaitForSeconds(checkDelay);
+        if (firstSelectedCard.CardFrontSprite == secondSelectedCard.CardFrontSprite)
+        {
+            firstSelectedCard.SetMatched();
+            secondSelectedCard.SetMatched();
+        }
+        else
+        {
+            firstSelectedCard.FlipCardSprite(false);
+            secondSelectedCard.FlipCardSprite(false);
+        }
+        isChecking = false;
+        firstSelectedCard = null;
+        secondSelectedCard = null;
     }
 }

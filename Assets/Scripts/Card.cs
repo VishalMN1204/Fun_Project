@@ -4,15 +4,16 @@ using UnityEngine.UI;
 public class Card : MonoBehaviour
 {
     public int CardId { get; private set; }
+    public Sprite CardFrontSprite { get; private set; }
     [SerializeField] Button cardBtn;
     [SerializeField] Image cardImage;
     [SerializeField] Sprite cardBackSprite;
-    Sprite cardFrontSprite;
     [SerializeField] bool isFlipped;
+    bool isMatched = false;
 
     private void OnEnable()
     {
-        cardBtn.onClick.AddListener(() => FlipCard());
+        cardBtn.onClick.AddListener(() => SelectCardToFlip());
     }
 
     private void OnDisable()
@@ -22,27 +23,34 @@ public class Card : MonoBehaviour
 
     public void InitializeCard(Sprite card, int _id)
     {
-        cardFrontSprite = card;
+        CardFrontSprite = card;
         cardImage.sprite = cardBackSprite;
         CardId = _id;
     }
 
-    void FlipCard()
+    void SelectCardToFlip()
     {
-        if (!isFlipped) FlipCardSprite(cardFrontSprite, isFlipped);
-        else FlipCardSprite(cardBackSprite, isFlipped);
+        // if the card is not flipped then make it flipped
+        if (isFlipped) return;
+        CardController.Instance.SelectCard(this);
     }
 
-    void FlipCardSprite(Sprite card1, bool _isFlipped)
+    public void FlipCardSprite(bool isFront = true)
     {
         RectTransform rectTransform = GetComponent<RectTransform>();
         LeanTween.scale(gameObject, new Vector3(0f, rectTransform.localScale.y, rectTransform.localScale.z), 0.1f).setOnComplete(() =>
         {
-            cardImage.sprite = card1;
+            cardImage.sprite = isFront ? CardFrontSprite : cardBackSprite;
             LeanTween.scale(gameObject, new Vector3(1f, rectTransform.localScale.y, rectTransform.localScale.z), 0.1f).setOnComplete(() =>
             {
-                isFlipped = !_isFlipped;
+                isFlipped = isFront;
             });
         });
+    }
+
+    public void SetMatched()
+    {
+        isMatched = true;
+        cardBtn.interactable = false;
     }
 }
