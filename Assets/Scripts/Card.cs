@@ -38,6 +38,7 @@ public class Card : MonoBehaviour
     public void FlipCardSprite(bool isFront = true)
     {
         RectTransform rectTransform = GetComponent<RectTransform>();
+        if (isFront) AudioManager.Instance.PlayCardFlipSound();
         LeanTween.scale(gameObject, new Vector3(0f, rectTransform.localScale.y, rectTransform.localScale.z), 0.1f).setOnComplete(() =>
         {
             cardImage.sprite = isFront ? CardFrontSprite : cardBackSprite;

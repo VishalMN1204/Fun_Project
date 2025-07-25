@@ -112,12 +112,14 @@ public class CardController : MonoBehaviour
                 firstSelectedCard.SetMatched();
                 secondSelectedCard.SetMatched();
                 UIManager.Instance.IncrementMatchScore();
+                AudioManager.Instance.PlayWinLoseSound(true);
                 StartCoroutine(nameof(CheckLevelOver));               
             }
             else
             {
                 firstSelectedCard.FlipCardSprite(false);
                 secondSelectedCard.FlipCardSprite(false);
+                AudioManager.Instance.PlayWinLoseSound(false);
             }
             flippedCardsLists.Remove(firstSelectedCard);
             flippedCardsLists.Remove(secondSelectedCard);
@@ -126,7 +128,7 @@ public class CardController : MonoBehaviour
         isChecking = false;
     }
 
-    void ClearOutCards()
+    public void ClearOutCards()
     {
         foreach (Card card in cardLists)
         {
@@ -151,14 +153,7 @@ public class CardController : MonoBehaviour
             if (!card.IsMatched) yield break;
         }
         yield return new WaitForSeconds(1f);
-        StartCoroutine(nameof(ChangeLevel));
-    }
-
-    IEnumerator ChangeLevel()
-    {
-        UIManager.Instance.ShowLoadingPanel();
-        ClearOutCards();
-        yield return new WaitForSeconds(1f);
-        LevelManager.Instance.IncrementLevel();
+        UIManager.Instance.EnableNextLevelButton(true);
+        //StartCoroutine(nameof(ChangeLevel));
     }
 }

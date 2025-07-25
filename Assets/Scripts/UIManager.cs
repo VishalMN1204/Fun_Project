@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
@@ -10,6 +11,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI matchTxt;
     [SerializeField] GameObject loadingPanel;
     [SerializeField] Image loadingImage;
+    [SerializeField] Button nextLevelBtn;
+    [SerializeField] GameObject endGamePanel;
+    [SerializeField] Button playAgainBtn;
+    [SerializeField] Button exitGameBtn;
     float turnScore;
     float matchScore;
     float loadDuration = 3f;
@@ -23,6 +28,20 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    private void OnEnable()
+    {
+        nextLevelBtn.onClick.AddListener(() => ProceedToNextLevel());
+        playAgainBtn.onClick.AddListener(() => PlayAgain());
+        exitGameBtn.onClick.AddListener(() => ExitGame());
+    }
+
+    private void OnDisable()
+    {
+        nextLevelBtn.onClick.RemoveAllListeners();
+        playAgainBtn.onClick.RemoveAllListeners();
+        exitGameBtn.onClick.RemoveAllListeners();
     }
 
     void Start()
@@ -69,7 +88,40 @@ public class UIManager : MonoBehaviour
         turnScore = 0f;
         matchScore = 0f;
         turnsTxt.text = $"Turns: {turnScore}";
-        matchTxt.text = $"Match: {matchScore}";
-        ;
+        matchTxt.text = $"Match: {matchScore}";       
+    }
+
+    public void EnableNextLevelButton(bool interactable)
+    {
+        nextLevelBtn.interactable = interactable;
+    }
+
+    void ProceedToNextLevel()
+    {
+        StartCoroutine(nameof(ProceedToNextLevelCoroutine));
+    }
+
+    IEnumerator ProceedToNextLevelCoroutine()
+    {
+        EnableNextLevelButton(false);
+        ShowLoadingPanel();
+        CardController.Instance.ClearOutCards();
+        yield return new WaitForSeconds(1f);
+        LevelManager.Instance.IncrementLevel();
+    }
+
+    public void ShowEndGamePanel()
+    {
+        endGamePanel.SetActive(true);
+    }
+
+    public void PlayAgain()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 }

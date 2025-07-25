@@ -119,8 +119,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 66be4b527fb7e7c43b62555ae196af6f
-      internalID: 1437463200
+      spriteID: 033bfb436fd520349a7a744115e28d9a
+      internalID: -1108589078
       vertices: []
       indices: 
       edges: []
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8de1a138db7558a4dad1de13fcaa4755
-      internalID: -809736333
+      spriteID: c29e33857ff4b294a88bc805d8c8cefe
+      internalID: 2143553420
       vertices: []
       indices: 
       edges: []
@@ -161,8 +161,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fb87731317508aa44b947f71b0e7bbf9
-      internalID: -1858225891
+      spriteID: d30657303acf9ec45a11f2b39727cf65
+      internalID: -1403768174
       vertices: []
       indices: 
       edges: []
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 15c164b0983c00f49b1a79bae0062b2a
-      internalID: -110369513
+      spriteID: d9f126e6680a1254d8a86d8e0b723111
+      internalID: 1003407190
       vertices: []
       indices: 
       edges: []
@@ -203,8 +203,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c19c5ebdbf28104478486bb6f8144fee
-      internalID: 1471195955
+      spriteID: 3e745cc3e515f0e4cb3cbc00ba8da2c1
+      internalID: 596285774
       vertices: []
       indices: 
       edges: []
@@ -224,8 +224,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f5305f27308ec2146aa19c09e5bb7d7e
-      internalID: 1810668896
+      spriteID: 6e4d93d5af609144eb83523e0b11b5a3
+      internalID: -500698622
       vertices: []
       indices: 
       edges: []
@@ -241,12 +241,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      colourful-web-buttons-pack_3: -110369513
-      colourful-web-buttons-pack_4: 1471195955
-      colourful-web-buttons-pack_1: -809736333
-      colourful-web-buttons-pack_5: 1810668896
-      colourful-web-buttons-pack_0: 1437463200
-      colourful-web-buttons-pack_2: -1858225891
+      colourful-web-buttons-pack_3: 1003407190
+      colourful-web-buttons-pack_4: 596285774
+      colourful-web-buttons-pack_1: 2143553420
+      colourful-web-buttons-pack_5: -500698622
+      colourful-web-buttons-pack_0: -1108589078
+      colourful-web-buttons-pack_2: -1403768174
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

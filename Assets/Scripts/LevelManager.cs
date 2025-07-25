@@ -29,7 +29,11 @@ public class LevelManager : MonoBehaviour
 
     public void IncrementLevel()
     {
-        if (currentLevelIndex >= levelData.cardLevels.Count - 1) return;
+        if (currentLevelIndex >= levelData.cardLevels.Count - 1)
+        {
+            UIManager.Instance.ShowEndGamePanel();
+            return;
+        }
         currentLevelIndex++;
         Debug.Log(currentLevelIndex.ToString());
         LoadLevel(CurrentLevel);
