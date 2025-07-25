@@ -26,6 +26,14 @@ MonoBehaviour:
     columns: 4
     timeLimitInSeconds: 20
   - level: 4
-    rows: 3
-    columns: 4
+    rows: 2
+    columns: 5
+    timeLimitInSeconds: 30
+  - level: 5
+    rows: 2
+    columns: 6
+    timeLimitInSeconds: 30
+  - level: 6
+    rows: 2
+    columns: 7
     timeLimitInSeconds: 30

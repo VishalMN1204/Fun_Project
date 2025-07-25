@@ -15,10 +15,9 @@ public class CardController : MonoBehaviour
 
     [SerializeField] List<Sprite> allCardSpritesList = new();
     [SerializeField] List<Sprite> cardShuffleList = new();
-    List<Card>cardLists = new();
+    List<Card> cardLists = new();
+    List<Card> flippedCardsLists = new();
 
-    Card firstSelectedCard;
-    Card secondSelectedCard;
     bool isChecking;
     private float checkDelay = 1f;
 
@@ -86,16 +85,14 @@ public class CardController : MonoBehaviour
 
     public void SelectCard(Card selectedCard)
     {
-        if (isChecking || selectedCard == firstSelectedCard || selectedCard == secondSelectedCard) return;
-        if (firstSelectedCard == null)
+        selectedCard.FlipCardSprite();
+        if (!flippedCardsLists.Contains(selectedCard))
         {
-            firstSelectedCard = selectedCard;
-            selectedCard.FlipCardSprite();
+            flippedCardsLists.Add(selectedCard);
         }
-        else
+
+        if (!isChecking && flippedCardsLists.Count >= 2)
         {
-            secondSelectedCard = selectedCard;
-            selectedCard.FlipCardSprite();
             StartCoroutine(nameof(MatchCardsCheck));
         }
     }
@@ -105,26 +102,33 @@ public class CardController : MonoBehaviour
         isChecking = true;
         UIManager.Instance.IncrementTurnScore();
         yield return new WaitForSeconds(checkDelay);
-        if (firstSelectedCard.CardFrontSprite == secondSelectedCard.CardFrontSprite)
+
+        while (flippedCardsLists.Count >= 2)
         {
-            firstSelectedCard.SetMatched();
-            secondSelectedCard.SetMatched();
-            UIManager.Instance.IncrementMatchScore();
-            StartCoroutine(nameof(CheckLevelOver));
+            Card firstSelectedCard = flippedCardsLists[0];
+            Card secondSelectedCard = flippedCardsLists[1];
+            if (firstSelectedCard.CardFrontSprite == secondSelectedCard.CardFrontSprite)
+            {
+                firstSelectedCard.SetMatched();
+                secondSelectedCard.SetMatched();
+                UIManager.Instance.IncrementMatchScore();
+                StartCoroutine(nameof(CheckLevelOver));               
+            }
+            else
+            {
+                firstSelectedCard.FlipCardSprite(false);
+                secondSelectedCard.FlipCardSprite(false);
+            }
+            flippedCardsLists.Remove(firstSelectedCard);
+            flippedCardsLists.Remove(secondSelectedCard);
         }
-        else
-        {
-            firstSelectedCard.FlipCardSprite(false);
-            secondSelectedCard.FlipCardSprite(false);
-        }
+
         isChecking = false;
-        firstSelectedCard = null;
-        secondSelectedCard = null;
     }
 
     void ClearOutCards()
     {
-        foreach(Card card in cardLists)
+        foreach (Card card in cardLists)
         {
             Destroy(card.gameObject);
         }
