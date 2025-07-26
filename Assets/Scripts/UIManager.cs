@@ -15,8 +15,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject endGamePanel;
     [SerializeField] Button playAgainBtn;
     [SerializeField] Button exitGameBtn;
-    float turnScore;
-    float matchScore;
+    public int TurnScore { get; private set; }
+    public int MatchScore { get; private set; }
     float loadDuration = 3f;
     public static UIManager Instance { get; private set; }
 
@@ -51,14 +51,14 @@ public class UIManager : MonoBehaviour
 
     public void IncrementTurnScore()
     {
-        turnScore++;
-        turnsTxt.text = $"Turns: {turnScore}";
+        TurnScore++;
+        turnsTxt.text = $"Turns: {TurnScore}";
     }
 
     public void IncrementMatchScore()
     {
-        matchScore++;
-        matchTxt.text = $"Match: {matchScore}";
+        MatchScore++;
+        matchTxt.text = $"Match: {MatchScore}";
     }
 
     public void ShowLoadingPanel()
@@ -71,7 +71,7 @@ public class UIManager : MonoBehaviour
         loadingPanel.SetActive(true);
         float timer = 0f;
         float progress = 0f;
-        ClearOutScores();
+        //ClearOutScores();
         while (timer < loadDuration)
         {
             timer += Time.deltaTime;
@@ -85,10 +85,10 @@ public class UIManager : MonoBehaviour
 
     public void ClearOutScores()
     {
-        turnScore = 0f;
-        matchScore = 0f;
-        turnsTxt.text = $"Turns: {turnScore}";
-        matchTxt.text = $"Match: {matchScore}";       
+        TurnScore = 0;
+        MatchScore = 0;
+        turnsTxt.text = $"Turns: {TurnScore}";
+        matchTxt.text = $"Match: {MatchScore}";       
     }
 
     public void EnableNextLevelButton(bool interactable)
@@ -105,6 +105,7 @@ public class UIManager : MonoBehaviour
     {
         EnableNextLevelButton(false);
         ShowLoadingPanel();
+        ClearOutScores();
         CardController.Instance.ClearOutCards();
         yield return new WaitForSeconds(1f);
         LevelManager.Instance.IncrementLevel();
@@ -123,5 +124,13 @@ public class UIManager : MonoBehaviour
     public void ExitGame()
     {
         Application.Quit();
+    }
+
+    public void SetScoresOnLoad(int turnScore,  int matchScore)
+    {
+        TurnScore = turnScore;
+        MatchScore = matchScore;
+        turnsTxt.text = $"Turns: {TurnScore}";
+        matchTxt.text = $"Match: {MatchScore}";
     }
 }

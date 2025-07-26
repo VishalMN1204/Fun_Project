@@ -144,11 +144,11 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 9453307faeb6ca048a022d176a12890e, type: 3}
   - {fileID: 21300000, guid: dad044ff826ea034d9bcac8d6d914759, type: 3}
   m_PackedSpriteNamesToIndex:
-  - spades_jack
+  - card_51
   - card_35
-  - spades_king
-  - Joker2
-  - spades_02
+  - card_52
+  - card_40
+  - card_41
   - card_5
   - card_18
   - card_6
@@ -160,41 +160,41 @@ SpriteAtlas:
   - card_25
   - card_28
   - card_15
-  - spades_03
+  - card_42
   - card_24
   - card_1
   - card_34
   - card_2
-  - spades_10
+  - card_49
   - card_14
   - card_4
-  - spades_08
+  - card_47
   - card_9
   - card_13
   - card_26
   - card_7
   - card_23
-  - spades_05
+  - card_44
   - card_38
   - card_20
   - card_32
   - card_17
-  - spades_queen
+  - card_53
   - card_33
   - card_36
   - card_16
   - card_8
   - card_31
-  - spades_07
-  - spades_09
+  - card_46
+  - card_48
   - card_21
-  - spades_ace
-  - spades_06
+  - card_50
+  - card_45
   - card_11
   - card_27
   - card_12
   - card_22
-  - spades_04
+  - card_43
   - card_0
   - card_30
   m_RenderDataMap: {}

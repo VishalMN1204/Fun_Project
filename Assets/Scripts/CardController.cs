@@ -17,9 +17,13 @@ public class CardController : MonoBehaviour
     [SerializeField] List<Sprite> cardShuffleList = new();
     List<Card> cardLists = new();
     List<Card> flippedCardsLists = new();
-
+    List<int> spriteIndexList = new();
+    List<int> matchedCardIndices = new();
     bool isChecking;
     private float checkDelay = 1f;
+    private int currentLevelIndex;
+    private int currentGridRows;
+    private int currentGridColumns;
 
     private void Awake()
     {
@@ -31,16 +35,20 @@ public class CardController : MonoBehaviour
         Instance = this;
     }
 
-    public void SetupLevel(CardLevelData level)
+    public void SetupLevel(CardLevelData level, bool isLoad = false)
     {
         int totalCards = level.rows * level.columns;
         int pairCount = totalCards / 2;
 
         grid.constraint = GridLayoutGroup.Constraint.FixedRowCount;
         grid.constraintCount = level.rows;
+        currentLevelIndex = level.level;
+        currentGridColumns = level.columns;
+        currentGridRows = level.rows;
         OnLoadCardSprites();
-        GenerateCardPairs(pairCount);
-        SpawnCards();
+        if (isLoad) LoadCardPairsFromSavedData(spriteIndexList);
+        else GenerateCardPairs(pairCount);
+        SpawnCards(isLoad);
     }
 
 
@@ -61,17 +69,39 @@ public class CardController : MonoBehaviour
         List<int> selectedIds = availableIndices.Take(pairCount).ToList();
 
         cardShuffleList.Clear();
+        spriteIndexList.Clear();
         foreach (int id in selectedIds)
         {
             Sprite sprite = allCardSpritesList[id];
+
+            spriteIndexList.Add(id);
+            spriteIndexList.Add(id);
+
             cardShuffleList.Add(sprite);
             cardShuffleList.Add(sprite);
         }
+        int seed = Random.Range(0, int.MaxValue);
+        System.Random rng = new(seed);
 
-        cardShuffleList = cardShuffleList.OrderBy(_ => Random.value).ToList();
+        int count = cardShuffleList.Count;
+        List<int> indices = Enumerable.Range(0, count).OrderBy(_ => rng.Next()).ToList();
+
+        cardShuffleList = indices.Select(i => cardShuffleList[i]).ToList();
+        spriteIndexList = indices.Select(i => spriteIndexList[i]).ToList();
     }
 
-    private void SpawnCards()
+    void LoadCardPairsFromSavedData(List<int> savedSpriteIndices)
+    {
+        //cardShuffleList.Clear();
+        //spriteIndexList.Clear();
+
+        foreach (int id in savedSpriteIndices)
+        {
+            cardShuffleList.Add(allCardSpritesList[id]);
+        }
+    }
+
+    void SpawnCards(bool isLoad = false)
     {
         for (int i = 0; i < cardShuffleList.Count; i++)
         {
@@ -80,7 +110,9 @@ public class CardController : MonoBehaviour
             card.InitializeCard(cardShuffleList[i], i);
             cardLists.Add(card);
         }
+        if(isLoad) StartCoroutine(ApplyMatchedCards(matchedCardIndices));
         StartCoroutine(nameof(FlipCardsToBackOnStart));
+
     }
 
     public void SelectCard(Card selectedCard)
@@ -113,7 +145,7 @@ public class CardController : MonoBehaviour
                 secondSelectedCard.SetMatched();
                 UIManager.Instance.IncrementMatchScore();
                 AudioManager.Instance.PlayWinLoseSound(true);
-                StartCoroutine(nameof(CheckLevelOver));               
+                StartCoroutine(nameof(CheckLevelOver));
             }
             else
             {
@@ -142,7 +174,7 @@ public class CardController : MonoBehaviour
         yield return new WaitForSeconds(1f);
         foreach (Card card in cardLists)
         {
-            card.FlipCardSprite(false);
+            if(!card.IsMatched) card.FlipCardSprite(false);
         }
     }
 
@@ -155,5 +187,47 @@ public class CardController : MonoBehaviour
         yield return new WaitForSeconds(1f);
         UIManager.Instance.EnableNextLevelButton(true);
         //StartCoroutine(nameof(ChangeLevel));
+    }
+
+    public SaveData CreateSaveData()
+    {
+        SaveData data = new()
+        {
+            levelIndex = currentLevelIndex,
+            rows = currentGridRows,
+            columns = currentGridColumns
+        };
+
+        foreach (Card card in cardLists)
+        {
+            if (card.IsMatched)
+                data.matchedCardIndices.Add(card.CardId); // Use unique ID or index
+        }
+        data.spriteIndices = spriteIndexList;
+        data.matchScore = UIManager.Instance.MatchScore;
+        data.turnScore = UIManager.Instance.TurnScore;
+
+        return data;
+    }
+
+    public void LoadFromSaveData(SaveData data)
+    {
+        currentLevelIndex = data.levelIndex;
+        currentGridRows = data.rows;
+        currentGridColumns = data.columns;
+        spriteIndexList = data.spriteIndices;
+        matchedCardIndices = data.matchedCardIndices;
+        LevelManager.Instance.GetLevelOnLoad(currentLevelIndex); // Make sure your CardController uses this
+
+        UIManager.Instance.SetScoresOnLoad(data.matchScore, data.turnScore);
+    }
+
+    IEnumerator ApplyMatchedCards(List<int> matchedIndices)
+    {
+        yield return new WaitForEndOfFrame(); // Wait for cards to be laid out
+        foreach (int index in matchedIndices)
+        {
+            cardLists[index].SetMatched(); // You may also want to disable interaction
+        }
     }
 }

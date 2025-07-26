@@ -13,5 +13,4 @@ public class CardLevelData
     public int level;
     public int rows;
     public int columns;
-    public float timeLimitInSeconds;
 }

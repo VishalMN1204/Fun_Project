@@ -19,12 +19,14 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        LoadLevel(CurrentLevel);
+        SaveData data = SaveManager.Instance.LoadGame();
+        if (data != null) CardController.Instance.LoadFromSaveData(data);
+        else LoadLevel(CurrentLevel);
     }
 
-    void LoadLevel(CardLevelData level)
+    void LoadLevel(CardLevelData level,bool isLoad = false)
     {
-        CardController.Instance.SetupLevel(level);
+        CardController.Instance.SetupLevel(level, isLoad);
     }
 
     public void IncrementLevel()
@@ -37,5 +39,15 @@ public class LevelManager : MonoBehaviour
         currentLevelIndex++;
         Debug.Log(currentLevelIndex.ToString());
         LoadLevel(CurrentLevel);
+    }
+
+    public void GetLevelOnLoad(int levelIndex)
+    {
+        foreach (CardLevelData cardLevel in levelData.cardLevels)
+        {
+            if (cardLevel.level == levelIndex) currentLevelIndex = levelIndex;
+        }
+
+        LoadLevel(CurrentLevel, isLoad: true);
     }
 }
